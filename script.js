@@ -221,56 +221,54 @@ quoteBtn.addEventListener("click", () => {
 });
 
 /* =========================
-   CONTACT FORM VALIDATION
+   CONTACT FORM + SUPABASE
 ========================= */
 
-const form =
-    document.getElementById("contactForm");
+const form = document.getElementById("contactForm");
 
-form.addEventListener("submit", (e) => {
-
+form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name =
-        document.getElementById("name").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const message = document.getElementById("message").value.trim();
 
-    const email =
-        document.getElementById("email").value.trim();
-
-    const subject =
-        document.getElementById("subject").value.trim();
-
-    const message =
-        document.getElementById("message").value.trim();
-
-    if(
-        name === "" ||
-        email === "" ||
-        subject === "" ||
-        message === ""
-    ){
-        alert(
-            "Please fill out all fields."
-        );
+    if (!name || !email || !subject || !message) {
+        alert("Please fill out all fields.");
         return;
     }
 
-    const emailPattern =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if(!emailPattern.test(email)){
-        alert(
-            "Please enter a valid email."
-        );
+    if (!emailPattern.test(email)) {
+        alert("Please enter a valid email.");
         return;
     }
 
-    alert(
-        "Message submitted successfully!"
-    );
+    const response = await fetch("https://lnqnxqvcxshviwpsdqce.supabase.co/rest/v1/messages", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "apikey": "sb_publishable_QqVkHVgCq2xZQpsf7UXJNA_Ee-AWFro",
+	    "Authorization": "Bearer sb_publishable_QqVkHVgCq2xZQpsf7UXJNA_Ee-AWFro",
+            "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({
+            name,
+            email,
+            subject,
+            message
+        })
+    });
 
-    form.reset();
-
+    if (response.ok) {
+        alert("Message sent successfully!");
+        form.reset();
+    } else {
+        alert("Failed to send message.");
+        console.log(await response.text());
+    }
 });
 
 /* =========================
